@@ -1,0 +1,14 @@
+# Ignore entire folders
+.venv/
+.vscode/
+__pycache__/
+frontend/node_modules/
+frontend/dist/
+backend/__pycache__/
+
+# Ignore environment files
+.env
+
+# Ignore OS-specific junk
+.DS_Store
+Thumbs.db
