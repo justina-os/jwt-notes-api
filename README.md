@@ -1,4 +1,4 @@
-# 📝 Notes API
+#  Notes API
 
 A simple Notes API built using **FastAPI**, **MySQL**, and **JWT Authentication**.
 
