@@ -7,11 +7,11 @@ from pydantic import BaseModel
 note = APIRouter()
 
 class Notes(BaseModel):
-    current_notes:str
+    content:str
 
-class UpdateNotes(BaseModel):
-    notes_id:int
-    current_notes:str
+# class UpdateNotes(BaseModel):
+#     notes_id:int
+#     content:str
 
 @note.get("/notes")
 def get_notes(
@@ -40,18 +40,18 @@ def add_notes(note:Notes,user_id:str=Depends(get_current_user)):
     try:
         con=get_connection()
         cur=con.cursor(dictionary=True)
-        cur.execute("insert into notes (notes,user_id) values(%s,%s)",(note.current_notes,int(user_id)))
+        cur.execute("insert into notes (notes,user_id) values(%s,%s)",(note.content,int(user_id)))
         con.commit()
-        return {"status": "Notes Added",
-                "note":note.current_notes
+        return {"message": "Note added successfully",
+                "note":note.content
                 }
 
     finally:
         cur.close()
         con.close()
 
-@note.patch("/notes")
-def update_notes(current_notes:UpdateNotes,user_id:str=Depends(get_current_user)):
+@note.patch("/notes/{notes_id}")
+def update_notes(notes_id:int,note:Notes,user_id:str=Depends(get_current_user)):
     try:
         con=get_connection()
         cur=con.cursor(dictionary=True)
@@ -60,7 +60,7 @@ def update_notes(current_notes:UpdateNotes,user_id:str=Depends(get_current_user)
                     set notes=%s
                     where user_id=%s and notes_id=%s
 
-""",(current_notes.current_notes,int(user_id),current_notes.notes_id))
+""",(note.content,int(user_id),notes_id))
         
         con.commit()
         if cur.rowcount == 0:
@@ -70,8 +70,8 @@ def update_notes(current_notes:UpdateNotes,user_id:str=Depends(get_current_user)
                   )
 
         return {
-            "message":"notes updated successfully",
-            "current_notes":current_notes.current_notes
+            "message":"Note updated successfully",
+            "content":note.content
         }
 
     finally:
@@ -80,12 +80,12 @@ def update_notes(current_notes:UpdateNotes,user_id:str=Depends(get_current_user)
         con.close()
 
 
-@note.delete("/notes")
-def delete_notes(note_id:int,user_id:str=Depends(get_current_user)):
+@note.delete("/notes/{notes_id}")
+def delete_notes(notes_id:int,user_id:str=Depends(get_current_user)):
     try:
         con=get_connection()
         cur=con.cursor(dictionary=True)
-        cur.execute("delete from notes where user_id=%s and notes_id=%s",(int(user_id),note_id))
+        cur.execute("delete from notes where user_id=%s and notes_id=%s",(int(user_id),notes_id))
         con.commit()
         if cur.rowcount == 0:
             raise HTTPException(status_code=404, detail="Note not found")

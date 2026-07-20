@@ -57,7 +57,7 @@ def verify_token(token: str):
             detail="Invalid token"
         )
 
-@login.post("/")
+@login.post("/login")
 def log_in(detail:Detail):
    
 
@@ -82,7 +82,7 @@ def log_in(detail:Detail):
     else:
         raise HTTPException(status_code=404 ,detail="User not found")
     
-@login.post("/sign_in")
+@login.post("/signup")
 def sign_in(detail:Detail):
     con=get_connection()
     cur=con.cursor(dictionary=True)
