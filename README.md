@@ -1,8 +1,8 @@
-#  Notes API
+#  JWT Notes API
 
-A simple Notes API built using **FastAPI**, **MySQL**, and **JWT Authentication**.
+A secure REST API for managing personal notes built with **FastAPI**, **MySQL**, and **JWT Authentication**.
 
-This project demonstrates user authentication, protected routes, and CRUD operations for notes.
+Users can create an account, log in, and perform CRUD operations on their own notes. Every endpoint is protected using JWT, ensuring users can only access their own data.
 
 ---
 
@@ -12,21 +12,22 @@ This project demonstrates user authentication, protected routes, and CRUD operat
 - User Login
 - JWT Authentication
 - Create Notes
-- View Notes
-- Update Notes
+- View Personal Notes
+- Update Existing Notes
 - Delete Notes
-- Password Hashing
-- Protected Routes using JWT
+- Request Validation using Pydantic
+- User-specific authorization
+- Proper HTTP error handling
 
 ---
 
 ##  Tech Stack
 
+- Python
 - FastAPI
 - MySQL
 - Pydantic
-- Python-JOSE (JWT)
-- Passlib/Bcrypt
+- JWT Authentication
 - Uvicorn
 
 ---
@@ -36,228 +37,112 @@ This project demonstrates user authentication, protected routes, and CRUD operat
 ```
 backend/
 │
-├── auth.py
-├── db.py
+├── routes/
+│   ├── register.py
+│   └── notes.py
 │
-└── routes/
-    ├── register.py
-    └── notes.py
+├── db.py
+├── jwt_handler.py
+└── main.py
 ```
 
 ---
 
-#  API Endpoints
+##  Authentication
 
-## 1. User Registration
+Authentication is implemented using JWT.
 
-### POST `/sign_in`
+### Public Endpoints
 
-Creates a new user.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /signup | Register a new user |
+| POST | /login | Login and receive a JWT access token |
 
-### Request Body
+### Protected Endpoints
 
-```json
-{
-    "mail_id": "user@gmail.com",
-    "password": "password123"
-}
-```
+All endpoints below require a valid JWT token.
 
-### Response
-
-```json
-{
-    "message": "User created"
-}
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /notes | Retrieve all notes of the logged-in user |
+| POST | /notes | Create a new note |
+| PATCH | /notes/{notes_id} | Update a specific note |
+| DELETE | /notes/{notes_id} | Delete a specific note |
 
 ---
 
-## 2. User Login
+##  Request Examples
 
-### POST `/`
+### Create Note
 
-Authenticates the user and returns a JWT token.
-
-### Request Body
+POST `/notes`
 
 ```json
 {
-    "mail_id": "user@gmail.com",
-    "password": "password123"
+    "content": "Learn FastAPI"
 }
 ```
 
-### Response
+### Update Note
+
+PATCH `/notes/1`
 
 ```json
 {
-    "access_token": "<JWT_TOKEN>",
-    "token_type": "bearer"
+    "content": "Learn FastAPI and JWT"
 }
 ```
 
 ---
 
-## 3. Get Notes
-
-### GET `/notes`
-
-Returns all notes belonging to the logged-in user.
-
-### Authorization
-
-```
-Bearer <JWT_TOKEN>
-```
-
-### Response
-
-```json
-[
-    {
-        "notes_id": 1,
-        "notes": "Study FastAPI"
-    },
-    {
-        "notes_id": 2,
-        "notes": "Complete assignment"
-    }
-]
-```
-
----
-
-## 4. Add Note
-
-### POST `/notes`
-
-### Authorization
-
-```
-Bearer <JWT_TOKEN>
-```
-
-### Request Body
+## Sample Response
 
 ```json
 {
-    "current_notes": "Learn JWT Authentication"
-}
-```
-
-### Response
-
-```json
-{
-    "status": "Notes Added",
-    "note": "Learn JWT Authentication"
+    "message": "Note added successfully",
+    "note": "Learn FastAPI"
 }
 ```
 
 ---
 
-## 5. Update Note
+##  Authorization
 
-### PATCH `/notes`
+Each authenticated user can:
 
-### Authorization
+- Create their own notes
+- View only their own notes
+- Update only their own notes
+- Delete only their own notes
 
-```
-Bearer <JWT_TOKEN>
-```
-
-### Request Body
-
-```json
-{
-    "notes_id": 1,
-    "current_notes": "Finish FastAPI Notes API"
-}
-```
-
-### Response
-
-```json
-{
-    "message": "notes updated successfully",
-    "current_notes": "Finish FastAPI Notes API"
-}
-```
+Users cannot access or modify another user's notes.
 
 ---
 
-## 6. Delete Note
+##  Concepts Practiced
 
-### DELETE `/notes?note_id=1`
-
-### Authorization
-
-```
-Bearer <JWT_TOKEN>
-```
-
-### Response
-
-```json
-{
-    "message": "Note deleted successfully"
-}
-```
-
----
-
-#  Authentication
-
-This project uses **JWT Authentication**.
-
-1. Register a user.
-2. Login to receive an access token.
-3. Click **Authorize** in Swagger UI.
-4. Enter:
-
-```
-Bearer <your_access_token>
-```
-
-5. Access all protected `/notes` endpoints.
-
----
-
-#  Concepts Practiced
-
-- FastAPI Routing
-- APIRouter
-- Pydantic Models
-- CRUD Operations
-- MySQL Integration
+- REST API Design
 - JWT Authentication
-- Password Hashing
-- Dependency Injection (`Depends`)
+- Dependency Injection
+- CRUD Operations
+- MySQL Database Integration
+- SQL Queries
+- Request Validation with Pydantic
 - HTTP Exception Handling
-- Protected Routes
+- FastAPI Routing
 
 ---
 
-#  Running the Project
 
-Install the required packages:
 
-```bash
-pip install fastapi uvicorn mysql-connector-python python-jose passlib[bcrypt]
-```
+##  Future Improvements
 
-Run the server:
-
-```bash
-uvicorn main:app --reload
-```
-
-Open Swagger UI:
-
-```
-http://127.0.0.1:8000/docs
-```
+- Search notes
+- Pagination
+- Docker support
+- Unit Testing
+- Note categories
+- Soft delete functionality
 
 ---
-
